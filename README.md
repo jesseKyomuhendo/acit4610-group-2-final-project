@@ -13,4 +13,4 @@ Tested with Python 3.13.
 ## Running
 _TODO: one-run and full-set commands per problem, settings, seed lists, data sources, runtimes._
 
-See `docs/PLAN.md` for design decisions and `AI_USAGE.md` for AI-assisted code.
+See `docs/PLAN.md` for design decisions.
