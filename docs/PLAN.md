@@ -51,4 +51,4 @@ Shared label constants. Optional Wilcoxon rank-sum tests.
 ## Report (written by humans only)
 ~6,000 words (limit 3,000-7,500), PDF, group no., names, repo link, AI statement, no code.
 Checklist in `docs/report_checklist.md` mapping every spec Report/Discussion item to a section.
-Mark AI code via `# AI-assisted:` headers and `AI_USAGE.md`. Members commit under own identity.
+Mark AI code via `# AI-assisted:` headers. Members commit under own identity.
