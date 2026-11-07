@@ -102,17 +102,19 @@ def main():
             rows = list(csv.DictReader(f))
         fig, axes = plt.subplots(3, 5, figsize=(20, 10), sharex=True)
         for ax, c in zip(axes.T.ravel(), all_cases()):
-            data = [[100 * (float(r["best_variance"]) - ref[c]) / ref[c]
+            # gaps <= 1e-6 % (ES equals the reference to ~8 digits) are floored for the log axis
+            data = [[max(100 * (float(r["best_variance"]) - ref[c]) / ref[c], 1e-6)
                      for r in rows if r["case"] == c and r["variant"] == v] for v in VARIANTS]
             bp = ax.boxplot(data, patch_artist=True)
             for patch, v in zip(bp["boxes"], VARIANTS):
                 patch.set_facecolor(COLORS[v]); patch.set_alpha(0.5)
             ax.set_xticks([1, 2, 3], [LABELS[v] for v in VARIANTS], fontsize=8)
-            ax.set_yscale("symlog", linthresh=1e-3)
+            ax.set_yscale("log")
             ax.set_title(c, fontsize=10); ax.grid(True, axis="y", alpha=0.3)
         for ax in axes[:, 0]:
-            ax.set_ylabel("Gap to SLSQP ref. (%) (symlog)")
-        fig.suptitle("Final variance gap to SLSQP reference, 10 seeds per variant")
+            ax.set_ylabel("Gap to SLSQP ref. (%) (log scale)")
+        fig.suptitle("Final variance gap to SLSQP reference, 10 seeds per variant "
+                     "(gaps below 1e-6 % shown at 1e-6 %)")
         fig.tight_layout(); fig.savefig(FIG / "gap_boxplots.png", dpi=120); plt.close(fig)
     print("figures written to", FIG)
 
