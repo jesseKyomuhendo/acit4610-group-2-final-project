@@ -38,8 +38,11 @@ def reversal_move(tour, rng):
 
 MOVES = {"swap": swap_move, "reversal": reversal_move}
 
+# Chosen by pilot tuning (experiments/tuning, setting E); used for both moves.
+TSP_PARAMS = BAParams(n=15, m=3, e=1, nep=50, nsp=25)
 
-def solve_tsp(instance, move, seed, params=BAParams(), budget=30_000):
+
+def solve_tsp(instance, move, seed, params=TSP_PARAMS, budget=30_000):
     """Run BA on a TSPInstance with the named move and return a BAResult."""
     dist = distance_matrix(instance.coords)
     n = instance.dimension

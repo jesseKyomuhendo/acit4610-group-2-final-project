@@ -11,6 +11,9 @@ from .functions import BENCHMARKS
 
 PATCH_FRACTION = 0.10
 
+# Chosen by pilot tuning (experiments/tuning, setting B).
+CONTINUOUS_PARAMS = BAParams(n=30, m=8, e=3, nep=30, nsp=10)
+
 
 def make_neighbour(lower, upper, fraction=PATCH_FRACTION):
     half_width = fraction * (upper - lower)
@@ -21,7 +24,7 @@ def make_neighbour(lower, upper, fraction=PATCH_FRACTION):
     return neighbour
 
 
-def solve_continuous(function, dim, seed, params=BAParams(), budget=30_000):
+def solve_continuous(function, dim, seed, params=CONTINUOUS_PARAMS, budget=30_000):
     """Run BA on a named benchmark ('sphere', 'rosenbrock', ...) in dim dimensions."""
     b = BENCHMARKS[function]
     return bees_algorithm(

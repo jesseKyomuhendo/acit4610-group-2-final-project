@@ -81,6 +81,6 @@ def test_same_seed_same_result(berlin52):
 
 
 def test_same_initial_population_for_both_moves(berlin52):
-    a = solve_tsp(berlin52, "swap", seed=5, budget=50)
-    b = solve_tsp(berlin52, "reversal", seed=5, budget=50)
+    a = solve_tsp(berlin52, "swap", seed=5, budget=15)
+    b = solve_tsp(berlin52, "reversal", seed=5, budget=15)
     assert a.initial_best == b.initial_best
