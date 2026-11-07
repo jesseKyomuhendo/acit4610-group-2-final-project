@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, simplex projection / return repair / feasibility check, reviewed by <member>
 """Constraint handling shared by all three ES variants.
 
 Repair is NOT an objective evaluation; it is applied to every candidate z

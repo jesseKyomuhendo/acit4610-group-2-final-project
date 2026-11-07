@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, OR-Library portfolio loader and case definitions, reviewed by <member>
 """Loading and validating the OR-Library portfolio datasets (port1-port5).
 
 File format (https://people.brunel.ac.uk/~mastjjb/jeb/orlib/portinfo.html):

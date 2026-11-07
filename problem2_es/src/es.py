@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, (1+1)-ES, (mu+lambda)-ES and (mu,lambda)-ES, reviewed by <member>
 """Evolution Strategies for long-only minimum-variance portfolios.
 
 Genotype = repaired weight vector w (plus step size(s)). Every candidate z is

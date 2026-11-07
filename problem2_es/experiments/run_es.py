@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, experiment runner, reviewed by <member>
 """Run ES experiments.
 
 From inside problem2_es/:

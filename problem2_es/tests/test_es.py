@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, unit tests for Problem 2, reviewed by <member>
 import numpy as np
 import pytest
 

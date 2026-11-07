@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, QP reference solution (analysis only), reviewed by <member>
 """Deterministic reference optimum via SciPy SLSQP.
 
 Used ONLY to judge ES solution quality in the tables/discussion (relative gap);

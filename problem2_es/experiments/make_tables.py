@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, summary-table generation, reviewed by <member>
 """Build summary tables from results/raw/runs.csv.
 
     python -m experiments.make_tables

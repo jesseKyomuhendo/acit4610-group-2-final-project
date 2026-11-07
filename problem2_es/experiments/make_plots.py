@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, figure generation, reviewed by <member>
 """Figures from results/raw/.
 
     python -m experiments.make_plots
