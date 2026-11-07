@@ -41,7 +41,7 @@ def reference_table():
         ports.setdefault(name, load_portfolio(name))
         _, v = reference_min_variance(ports[name], ports[name].r_min(alpha))
         ref[c] = v
-    with (OUT / "reference.csv").open("w", newline="") as f:
+    with (OUT / "reference.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["case", "reference_variance_slsqp"])
         for c, v in ref.items():
@@ -72,7 +72,7 @@ def main():
                 held=np.mean([int(r["n_assets_held"]) for r in runs]),
                 evals=",".join(sorted({r["evals"] for r in runs}))))
 
-    with (OUT / "summary.csv").open("w", newline="") as f:
+    with (OUT / "summary.csv").open("w", newline="", encoding="utf-8") as f:
         wr = csv.DictWriter(f, fieldnames=list(rows[0]))
         wr.writeheader()
         wr.writerows(rows)
@@ -97,7 +97,7 @@ def main():
 
     # Pairwise Wilcoxon rank-sum tests on final variance (two-sided)
     pairs = [("1+1", "plus"), ("1+1", "comma"), ("plus", "comma")]
-    with (OUT / "wilcoxon.csv").open("w", newline="") as f:
+    with (OUT / "wilcoxon.csv").open("w", newline="", encoding="utf-8") as f:
         wr = csv.writer(f)
         wr.writerow(["case"] + [f"p_{a}_vs_{b}" for a, b in pairs])
         for c in all_cases():
@@ -107,7 +107,7 @@ def main():
                 xb = [float(r["best_variance"]) for r in by[(c, b)]]
                 out.append(f"{ranksums(xa, xb).pvalue:.3e}")
             wr.writerow(out)
-    print("\n".join(md))
+    print("summary written to", OUT)
 
 
 if __name__ == "__main__":
