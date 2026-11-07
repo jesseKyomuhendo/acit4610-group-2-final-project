@@ -101,7 +101,10 @@ def population_es(port, r_min, seed, plus, mu=10, lam=70, budget=30_000):
         O_s = np.empty((k, n))
         O_f = np.empty(k)
         for c in range(k):
-            a, b = rng.choice(mu, size=2, replace=False)   # two distinct parents, uniform
+            # two distinct parents, uniformly at random (cheaper than rng.choice)
+            a = int(rng.integers(mu))
+            b = int(rng.integers(mu - 1))
+            b += b >= a
             w_r = 0.5 * (P_w[a] + P_w[b])
             s_r = np.sqrt(P_s[a] * P_s[b])
             z0 = rng.standard_normal()                     # shared across coordinates
