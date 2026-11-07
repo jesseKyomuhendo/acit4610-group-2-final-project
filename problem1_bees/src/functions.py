@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, continuous benchmark functions, reviewed by <member>
 """Continuous benchmark functions for Part B (Surjanovic & Bingham, SFU).
 
 All four are unshifted and noiseless, with global minimum 0. Each takes a 1-D

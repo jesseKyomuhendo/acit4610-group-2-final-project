@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, benchmark function tests, reviewed by <member>
 """Each function is checked at its known minimiser and at one other point.
 
 Expected values at the other point follow directly from the SFU definitions:

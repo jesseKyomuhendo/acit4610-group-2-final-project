@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, Evaluator scaffold, reviewed by <member>
 """Evaluation budget shared by every algorithm in this problem.
 
 Every objective call goes through Evaluator, so initial population, recruits,

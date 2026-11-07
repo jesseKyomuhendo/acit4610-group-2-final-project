@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, TSPLIB loader, reviewed by <member>
 """Loading and validation of TSPLIB instances.
 
 Only symmetric EUC_2D instances are accepted. Files are read straight from the

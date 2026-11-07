@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, distance and tour tests, reviewed by <member>
 """Published optimal tours are used here only to check the distance rule.
 They are never read by the Bees Algorithm."""
 import gzip

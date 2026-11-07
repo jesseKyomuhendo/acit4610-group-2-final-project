@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, distances and tour utilities, reviewed by <member>
 """Distances, tour length and tour validation for symmetric EUC_2D TSP.
 
 A tour is a permutation of 0-based city indices (index k is TSPLIB city k + 1).

@@ -1,4 +1,3 @@
-# AI-assisted: Claude Code, TSPLIB loader tests, reviewed by <member>
 import pytest
 
 from src.tsplib import INSTANCES, load_instance, parse_tsplib
