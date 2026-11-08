@@ -3,8 +3,13 @@
 Every objective call goes through Evaluator, so initial population, recruits,
 scouts / offspring and rejected candidates are all counted. Best-so-far is
 tracked here, which also gives the archive required by the spec.
+
+Default budget and logging interval come from config_ba.yaml
+(`budget`, `log_every`).
 """
 import numpy as np
+
+from prob_1_util.ba_config_loader import BUDGET, LOG_EVERY
 
 
 class BudgetExhausted(Exception):
@@ -12,7 +17,7 @@ class BudgetExhausted(Exception):
 
 
 class Evaluator:
-    def __init__(self, f, budget=30_000, log_every=10):
+    def __init__(self, f, budget=BUDGET, log_every=LOG_EVERY):
         self.f = f
         self.budget = budget
         self.log_every = log_every

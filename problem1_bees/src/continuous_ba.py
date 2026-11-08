@@ -1,18 +1,22 @@
 """Bees Algorithm for bounded continuous minimisation.
 
 Scouts are drawn uniformly within the bounds. A recruit changes every
-coordinate independently by a uniform amount in [-10%, +10%] of the allowed
-range (upper - lower) and is then clipped to the bounds.
+coordinate independently by a uniform amount in [-patch_fraction,
++patch_fraction] of the allowed range (upper - lower) and is then clipped to
+the bounds.
+
+PATCH_FRACTION (0.10), the BA settings and the budget come from config_ba.yaml
+(`continuous.patch_fraction`, `continuous.ba`, `budget`).
 """
 import numpy as np
+
+from prob_1_util.ba_config_loader import BUDGET, CONTINUOUS_BA, PATCH_FRACTION
 
 from .bees import BAParams, bees_algorithm
 from .functions import BENCHMARKS
 
-PATCH_FRACTION = 0.10
-
 # Chosen by pilot tuning (experiments/tuning, setting B).
-CONTINUOUS_PARAMS = BAParams(n=30, m=8, e=3, nep=30, nsp=10)
+CONTINUOUS_PARAMS = BAParams(**CONTINUOUS_BA)
 
 
 def make_neighbour(lower, upper, fraction=PATCH_FRACTION):
@@ -24,7 +28,7 @@ def make_neighbour(lower, upper, fraction=PATCH_FRACTION):
     return neighbour
 
 
-def solve_continuous(function, dim, seed, params=CONTINUOUS_PARAMS, budget=30_000):
+def solve_continuous(function, dim, seed, params=CONTINUOUS_PARAMS, budget=BUDGET):
     """Run BA on a named benchmark ('sphere', 'rosenbrock', ...) in dim dimensions."""
     b = BENCHMARKS[function]
     return bees_algorithm(

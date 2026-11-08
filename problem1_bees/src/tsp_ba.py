@@ -3,8 +3,13 @@
 Tours are permutations of 0-based city indices with city 1 (index 0) fixed in
 position 0. Both moves only touch positions 1..n-1, so city 1 never moves and
 every neighbour is still a valid permutation.
+
+The move names, the BA settings and the budget come from config_ba.yaml
+(`tsp.moves`, `tsp.ba`, `budget`). The moves themselves are implemented here.
 """
 import numpy as np
+
+from prob_1_util.ba_config_loader import BUDGET, MOVE_NAMES, TSP_BA
 
 from .bees import BAParams, bees_algorithm
 from .tour import distance_matrix, tour_length, validate_tour
@@ -36,13 +41,17 @@ def reversal_move(tour, rng):
     return new
 
 
-MOVES = {"swap": swap_move, "reversal": reversal_move}
+# YAML move name -> Python move function.
+MOVE_FUNCTIONS = {"swap": swap_move, "reversal": reversal_move}
+
+# The moves listed in config_ba.yaml, in the same order.
+MOVES = {name: MOVE_FUNCTIONS[name] for name in MOVE_NAMES}
 
 # Chosen by pilot tuning (experiments/tuning, setting E); used for both moves.
-TSP_PARAMS = BAParams(n=15, m=3, e=1, nep=50, nsp=25)
+TSP_PARAMS = BAParams(**TSP_BA)
 
 
-def solve_tsp(instance, move, seed, params=TSP_PARAMS, budget=30_000):
+def solve_tsp(instance, move, seed, params=TSP_PARAMS, budget=BUDGET):
     """Run BA on a TSPInstance with the named move and return a BAResult."""
     dist = distance_matrix(instance.coords)
     n = instance.dimension

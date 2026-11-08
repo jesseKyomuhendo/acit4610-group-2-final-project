@@ -2,6 +2,10 @@
 
 Only symmetric EUC_2D instances are accepted. Files are read straight from the
 original .tsp.gz archives (decompressed in memory); plain .tsp also works.
+
+The data folder, the six instances with their optima, and the required TYPE /
+EDGE_WEIGHT_TYPE come from config_ba.yaml (`paths.data_dir`, `tsp.instances`,
+`tsp.required_type`, `tsp.required_edge_weight_type`).
 """
 import gzip
 from dataclasses import dataclass
@@ -9,17 +13,14 @@ from pathlib import Path
 
 import numpy as np
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from prob_1_util.ba_config_loader import (
+    INSTANCES,  # name -> (cities, optimal tour length)
+    PATHS,
+    REQUIRED_EDGE_WEIGHT_TYPE,
+    REQUIRED_TYPE,
+)
 
-# Instances required by the assignment: name -> (cities, optimal tour length).
-INSTANCES = {
-    "eil51": (51, 426),
-    "berlin52": (52, 7542),
-    "st70": (70, 675),
-    "eil76": (76, 538),
-    "kroA100": (100, 21282),
-    "ch150": (150, 6528),
-}
+DATA_DIR = PATHS["data_dir"]
 
 
 @dataclass
@@ -71,10 +72,13 @@ def parse_tsplib(path, expected_dimension=None):
             fail(f"missing {key}")
     if not in_coords:
         fail("missing NODE_COORD_SECTION")
-    if header["TYPE"] != "TSP":
-        fail(f"TYPE must be TSP, got {header['TYPE']}")
-    if header["EDGE_WEIGHT_TYPE"] != "EUC_2D":
-        fail(f"EDGE_WEIGHT_TYPE must be EUC_2D, got {header['EDGE_WEIGHT_TYPE']}")
+    if header["TYPE"] != REQUIRED_TYPE:
+        fail(f"TYPE must be {REQUIRED_TYPE}, got {header['TYPE']}")
+    if header["EDGE_WEIGHT_TYPE"] != REQUIRED_EDGE_WEIGHT_TYPE:
+        fail(
+            f"EDGE_WEIGHT_TYPE must be {REQUIRED_EDGE_WEIGHT_TYPE}, "
+            f"got {header['EDGE_WEIGHT_TYPE']}"
+        )
 
     try:
         dimension = int(header["DIMENSION"])

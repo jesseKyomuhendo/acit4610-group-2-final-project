@@ -1,47 +1,54 @@
 """Pilot tuning of the BA settings.
 
-Runs a few candidate settings on berlin52 (both moves) and Rastrigin D=10 with
-tuning seeds 100-102, which are never used in the main experiments (seeds 0-9).
-Writes results/tuning/tuning.csv and prints mean results per setting.
+Runs each candidate setting on every tuning case with the tuning seeds, which
+are never used in the main experiments. Writes results/tuning/tuning.csv and
+prints mean results per setting.
+
+Candidates, cases, seeds and the output path come from config_ba.yaml
+(`tuning.candidates`, `tuning.cases`, `tuning.seeds`, `paths.tuning_csv`).
 
 Usage (from problem1_bees/):
     python -m experiments.tuning.tune_ba
 """
 import csv
-from pathlib import Path
 
 import numpy as np
 
+from prob_1_util.ba_config_loader import PATHS, TUNING_CANDIDATES, TUNING_CASES, TUNING_SEEDS
 from src.bees import BAParams
 from src.continuous_ba import solve_continuous
 from src.tsp_ba import solve_tsp
 from src.tsplib import load_instance
 
-TUNING_SEEDS = (100, 101, 102)
+CANDIDATES = {label: BAParams(**p) for label, p in TUNING_CANDIDATES.items()}
 
-CANDIDATES = {
-    "A": BAParams(n=50, m=10, e=3, nep=20, nsp=10),
-    "B": BAParams(n=30, m=8, e=3, nep=30, nsp=10),
-    "C": BAParams(n=20, m=6, e=2, nep=30, nsp=15),
-    "D": BAParams(n=10, m=5, e=2, nep=40, nsp=20),
-    "E": BAParams(n=15, m=3, e=1, nep=50, nsp=25),
-    "F": BAParams(n=100, m=20, e=5, nep=15, nsp=5),
-}
+OUT = PATHS["tuning_csv"]
 
-OUT = Path(__file__).resolve().parents[2] / "results" / "tuning" / "tuning.csv"
+
+def case_label(case):
+    """Short name used in the CSV, e.g. 'berlin52_swap' or 'rastrigin_10'."""
+    if case["problem"] == "tsp":
+        return f"{case['instance']}_{case['move']}"
+    return f"{case['function']}_{case['dimension']}"
 
 
 def main():
-    berlin = load_instance("berlin52")
+    # Load each TSP instance once, not once per run.
+    instances = {
+        c["instance"]: load_instance(c["instance"]) for c in TUNING_CASES if c["problem"] == "tsp"
+    }
     rows = []
     for label, p in CANDIDATES.items():
         for seed in TUNING_SEEDS:
-            for move in ("swap", "reversal"):
-                r = solve_tsp(berlin, move, seed, params=p)
-                gap = 100 * (r.best - berlin.optimum) / berlin.optimum
-                rows.append([label, p.n, p.m, p.e, p.nep, p.nsp, f"berlin52_{move}", seed, r.best, gap])
-            r = solve_continuous("rastrigin", 10, seed, params=p)
-            rows.append([label, p.n, p.m, p.e, p.nep, p.nsp, "rastrigin_10", seed, r.best, ""])
+            for case in TUNING_CASES:
+                if case["problem"] == "tsp":
+                    inst = instances[case["instance"]]
+                    r = solve_tsp(inst, case["move"], seed, params=p)
+                    gap = 100 * (r.best - inst.optimum) / inst.optimum
+                else:
+                    r = solve_continuous(case["function"], case["dimension"], seed, params=p)
+                    gap = ""
+                rows.append([label, p.n, p.m, p.e, p.nep, p.nsp, case_label(case), seed, r.best, gap])
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, "w", newline="") as f:
@@ -49,7 +56,7 @@ def main():
         w.writerow(["setting", "n", "m", "e", "nep", "nsp", "case", "seed", "best", "gap_pct"])
         w.writerows(rows)
 
-    cases = ["berlin52_swap", "berlin52_reversal", "rastrigin_10"]
+    cases = [case_label(c) for c in TUNING_CASES]
     print(f"{'setting':8s}" + "".join(f"{c:>20s}" for c in cases))
     for label, p in CANDIDATES.items():
         means = [np.mean([r[8] for r in rows if r[0] == label and r[6] == c]) for c in cases]

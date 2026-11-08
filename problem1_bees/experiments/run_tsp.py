@@ -5,6 +5,9 @@ results/raw/tsp/<instance>_<move>_s<seed>.npz with the best-so-far history and
 final tour; results/raw/tsp_runs.csv is rebuilt from those files after every
 invocation. Existing runs are skipped, so an interrupted --all can be resumed.
 
+Seeds and output paths come from config_ba.yaml (`seeds`,
+`paths.tsp_runs_dir`, `paths.tsp_runs_csv`).
+
 Usage (from problem1_bees/):
     python -m experiments.run_tsp --instance berlin52 --move swap --seed 0
     python -m experiments.run_tsp --all
@@ -12,18 +15,16 @@ Usage (from problem1_bees/):
 import argparse
 import csv
 import time
-from pathlib import Path
 
 import numpy as np
 
+from prob_1_util.ba_config_loader import PATHS, SEEDS
 from src.tour import closed_route
 from src.tsp_ba import MOVES, TSP_PARAMS, solve_tsp
 from src.tsplib import INSTANCES, load_instance
 
-SEEDS = tuple(range(10))
-RAW = Path(__file__).resolve().parents[1] / "results" / "raw"
-RUN_DIR = RAW / "tsp"
-CSV_PATH = RAW / "tsp_runs.csv"
+RUN_DIR = PATHS["tsp_runs_dir"]
+CSV_PATH = PATHS["tsp_runs_csv"]
 COLUMNS = [
     "instance", "cities", "optimum", "move", "seed", "initial_best", "best",
     "gap_pct", "evaluations", "iterations", "runtime_s", "tour",

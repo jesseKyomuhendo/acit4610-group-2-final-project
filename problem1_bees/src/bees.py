@@ -13,19 +13,27 @@ Each iteration:
 Every candidate (initial scouts, recruits, fresh scouts) costs one evaluation,
 whether it is kept or not. The run stops as soon as the budget is spent, which
 may be in the middle of an iteration.
+
+The default budget comes from config_ba.yaml (`budget`). The BA settings used
+in the experiments come from config_ba.yaml (`tsp.ba`, `continuous.ba`) and are
+passed in by tsp_ba.py and continuous_ba.py.
 """
 from dataclasses import dataclass
+
+from prob_1_util.ba_config_loader import BUDGET
 
 from .budget import BudgetExhausted, Evaluator
 
 
 @dataclass(frozen=True)
 class BAParams:
-    n: int = 50  # scout bees / sites
-    m: int = 10  # selected sites
-    e: int = 3  # elite sites (among the m)
-    nep: int = 20  # recruits per elite site
-    nsp: int = 10  # recruits per other selected site
+    # No defaults: every caller must state all five values. The experiments
+    # build these from config_ba.yaml (`tsp.ba`, `continuous.ba`).
+    n: int  # scout bees / sites
+    m: int  # selected sites
+    e: int  # elite sites (among the m)
+    nep: int  # recruits per elite site
+    nsp: int  # recruits per other selected site
 
     def __post_init__(self):
         if not (0 < self.e <= self.m <= self.n):
@@ -45,7 +53,7 @@ class BAResult:
     history_best: list
 
 
-def bees_algorithm(objective, random_solution, neighbour, params, rng, budget=30_000):
+def bees_algorithm(objective, random_solution, neighbour, params, rng, budget=BUDGET):
     """Minimise objective within the evaluation budget.
 
     random_solution(rng) -> new solution

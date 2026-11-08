@@ -66,7 +66,7 @@ def test_stops_mid_iteration():
         objective,
         random_solution=lambda rng: rng.random(),
         neighbour=lambda x, rng: x + rng.normal() * 0.1,
-        params=BAParams(),
+        params=BAParams(n=50, m=10, e=3, nep=20, nsp=10),
         rng=np.random.default_rng(0),
         budget=300,
     )
