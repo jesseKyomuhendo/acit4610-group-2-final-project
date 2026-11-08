@@ -2,8 +2,10 @@
 # config_ba.yaml - Problem 1: Bees Algorithm (BA) for TSP (Part A) and
 # continuous optimisation (Part B).
 #
-# Every setting used in the experiments is listed here, so the README and the
-# report can refer to this one file.
+# Working reference for the group: every setting used in the experiments, with
+# where it comes from and why. This file complements the README, it does not
+# replace it: the README still states the settings the assignment requires
+# (BA settings, seeds, data locations, commands). Keep the two in sync.
 #
 # Comment tags:
 #   [spec]   fixed by the assignment (Portfolio 2026.pdf, Problem 1).
