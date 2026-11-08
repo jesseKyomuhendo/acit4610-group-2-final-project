@@ -22,6 +22,10 @@
 #   the basic BA from the 2006 paper.
 # =============================================================================
 
+# Debug only: printed by `python -m prob_1_util.ba_config_loader` to show the
+# file was found and parsed.
+load_message: "config_ba.yaml loaded successfully"
+
 # -----------------------------------------------------------------------------
 # Shared by Part A and Part B
 # -----------------------------------------------------------------------------
