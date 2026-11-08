@@ -1,0 +1,158 @@
+# =============================================================================
+# config_ba.yaml - Problem 1: Bees Algorithm (BA) for TSP (Part A) and
+# continuous optimisation (Part B).
+#
+# Every setting used in the experiments is listed here, so the README and the
+# report can refer to this one file.
+#
+# Comment tags:
+#   [spec]   fixed by the assignment (Portfolio 2026.pdf, Problem 1).
+#            Do not change, or the results no longer answer the assignment.
+#   [choice] our own design decision; the comment says why.
+#
+# BA symbols follow Pham et al. (2006):
+#   n   = number of scout bees (sites kept in the population)
+#   m   = number of selected sites (best m of the n)
+#   e   = number of elite sites (best e of the m)
+#   nep = recruited bees per elite site
+#   nsp = recruited bees per other selected site (m - e of them)
+#   The remaining n - m sites are replaced by fresh random scouts each iteration.
+#   Evaluations per full iteration = e*nep + (m - e)*nsp + (n - m).
+#   Not used: site abandonment (stlim) and neighbourhood shrinking. We use
+#   the basic BA from the 2006 paper.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Shared by Part A and Part B
+# -----------------------------------------------------------------------------
+budget: 30000              # [spec] objective evaluations per run. Counts the initial
+                           # population, every recruit and every fresh scout, including
+                           # rejected ones. The run stops mid-iteration when this is
+                           # reached (src/budget.py, src/bees.py).
+log_every: 10              # [choice] record best-so-far every 10 evaluations, plus at
+                           # the final evaluation. Used for the convergence plots.
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]   # [spec] 10 independent runs per case.
+                           # The same seeds are used for swap and reversal, so both
+                           # versions start from the same initial population.
+
+paths:
+  data_dir: data                         # the six original .tsp.gz files (see data/SOURCES.md)
+  raw_dir: results/raw                   # one .npz per run + summary CSVs
+  tsp_runs_dir: results/raw/tsp          # <instance>_<move>_s<seed>.npz
+  tsp_runs_csv: results/raw/tsp_runs.csv
+  continuous_runs_dir: results/raw/continuous
+  continuous_runs_csv: results/raw/continuous_runs.csv
+  tables_dir: results/tables
+  figures_dir: results/figures
+  tuning_csv: results/tuning/tuning.csv
+
+# -----------------------------------------------------------------------------
+# Part A - Travelling Salesman Problem
+# -----------------------------------------------------------------------------
+tsp:
+  # [spec] Six symmetric TSPLIB instances: name -> cities, optimal tour length.
+  # Files are read from data/<name>.tsp.gz. Source URLs are in data/SOURCES.md.
+  instances:
+    eil51:    {cities: 51,  optimum: 426}
+    berlin52: {cities: 52,  optimum: 7542}
+    st70:     {cities: 70,  optimum: 675}
+    eil76:    {cities: 76,  optimum: 538}
+    kroA100:  {cities: 100, optimum: 21282}
+    ch150:    {cities: 150, optimum: 6528}
+
+  # [spec] Validation in src/tsplib.py: NAME, TYPE, DIMENSION, EDGE_WEIGHT_TYPE and
+  # NODE_COORD_SECTION must exist; TYPE = TSP; EDGE_WEIGHT_TYPE = EUC_2D; row count
+  # equals DIMENSION; city ids are unique and exactly 1..DIMENSION.
+  required_type: TSP
+  required_edge_weight_type: EUC_2D
+
+  # [spec] Distance rule (src/tour.py): d_ij = floor(sqrt(dx^2 + dy^2) + 0.5), rounded
+  # per edge before summing, return leg included. City 1 is fixed in position 0.
+  fixed_start_city: 1
+
+  # [spec] Two BA versions, one random move per recruit, city 1 never moves
+  # (src/tsp_ba.py).
+  #   swap:     exchange the cities at two random positions
+  #   reversal: reverse the segment between two random positions (inclusive)
+  moves: [swap, reversal]
+
+  # [spec] Scouts are uniformly shuffled permutations with city 1 first.
+  # [choice] BA settings, chosen by pilot tuning (setting E, see `tuning` below).
+  # The same settings are used for both moves [spec].
+  # Few sites (m = 3) with many recruits each (nep = 50) means intensive local
+  # search: one random swap/reversal rarely improves a tour, so a site needs many
+  # tries per iteration. Few fresh scouts (n - m = 12) because a random tour is
+  # almost never competitive with an improved one.
+  # Evaluations per iteration = 1*50 + 2*25 + 12 = 112.
+  ba:
+    n: 15
+    m: 3
+    e: 1
+    nep: 50
+    nsp: 25
+
+  # [spec] Gap(%) = 100 * (L_BA - L*) / L*, with L* the optimum above.
+
+  # [spec] Required figures (Part A)
+  convergence_plot_instances: [berlin52, ch150]   # mean best-so-far over 10 seeds,
+                                                  # both moves, optimum marked
+  route_plot_instance: berlin52                   # shortest tour over both moves and
+                                                  # all seeds, return leg drawn
+
+# -----------------------------------------------------------------------------
+# Part B - Continuous function optimisation
+# -----------------------------------------------------------------------------
+continuous:
+  # [spec] Four unshifted, noiseless SFU functions (src/functions.py). Global minimum
+  # is 0 for all of them; `minimiser` is the value of every coordinate at the optimum.
+  # It is used only in tests, never in the search [spec].
+  functions:
+    sphere:     {lower: -5.12,   upper: 5.12,   minimiser: 0.0}
+    rosenbrock: {lower: -5.0,    upper: 10.0,   minimiser: 1.0}
+    rastrigin:  {lower: -5.12,   upper: 5.12,   minimiser: 0.0}
+    ackley:     {lower: -32.768, upper: 32.768, minimiser: 0.0}
+
+  dimensions: [10, 30]       # [spec] 4 functions x 2 dimensions = 8 cases, 80 runs
+
+  # [spec] Neighbourhood (src/continuous_ba.py): every coordinate gets an independent
+  # uniform change in [-patch_fraction, +patch_fraction] * (upper - lower), and the
+  # result is clipped to the bounds. Scouts are uniform within the bounds.
+  patch_fraction: 0.10
+
+  # [choice] BA settings, chosen by pilot tuning (setting B, see `tuning` below).
+  # More sites and more scouts than for TSP: in continuous space a fresh uniform
+  # scout can land in a new basin (important on Rastrigin/Ackley), so global
+  # exploration is worth more evaluations.
+  # Evaluations per iteration = 3*30 + 5*10 + 22 = 162.
+  ba:
+    n: 30
+    m: 8
+    e: 3
+    nep: 30
+    nsp: 10
+
+  # [spec] Required figures (Part B)
+  convergence_plot: {function: rastrigin, dimension: 10}   # log scale, labelled
+  boxplot_dimension: 30                                    # four panels, one figure
+
+# -----------------------------------------------------------------------------
+# Pilot tuning (experiments/tuning/tune_ba.py)
+# -----------------------------------------------------------------------------
+# [choice] Six candidate settings were each run on berlin52 (swap and reversal) and
+# Rastrigin D = 10. Tuning seeds 100-102 are separate from the experiment seeds
+# 0-9, so no reported run was used to pick its own settings. Note for the report:
+# berlin52 and Rastrigin D = 10 are also reported cases.
+# Setting E was chosen for TSP, setting B for continuous (lowest mean best).
+tuning:
+  seeds: [100, 101, 102]
+  cases:
+    - {problem: tsp, instance: berlin52, move: swap}
+    - {problem: tsp, instance: berlin52, move: reversal}
+    - {problem: continuous, function: rastrigin, dimension: 10}
+  candidates:
+    A: {n: 50,  m: 10, e: 3, nep: 20, nsp: 10}
+    B: {n: 30,  m: 8,  e: 3, nep: 30, nsp: 10}   # chosen for continuous
+    C: {n: 20,  m: 6,  e: 2, nep: 30, nsp: 15}
+    D: {n: 10,  m: 5,  e: 2, nep: 40, nsp: 20}
+    E: {n: 15,  m: 3,  e: 1, nep: 50, nsp: 25}   # chosen for TSP
+    F: {n: 100, m: 20, e: 5, nep: 15, nsp: 5}
